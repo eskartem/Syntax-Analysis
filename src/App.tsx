@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   let variablesRef = useRef(null)
   let expressionRef = useRef(null)
   let tokensRef = useRef(null)
@@ -44,11 +44,11 @@ function App() {
     return tokens[currentIndex];
   }
 
-  function validateVariable(variable, variablesList) {
+  function validateVariable(variable: string, variablesList:string[]) {
     return variablesList.includes(variable);
   }
 
-  function E(variables) {
+  function E(variables:string[]) {
     if (validateVariable(currentToken(), variables)) {
       readToken();
     } else if (currentToken() === "not") {
@@ -73,7 +73,7 @@ function App() {
     }
   }
 
-  function O(variables) {
+  function O(variables:string[]) {
     if (currentToken() === "if") {
       readToken();
       E(variables);
@@ -108,9 +108,8 @@ function App() {
   }
 
   const validateButton = () => {
-    console.log(1)
     if (variablesRef.current) {
-      const variables = variablesRef.current.value.split("\n").map(v => v.trim()).filter(v => v);
+      const variables = variablesRef.current.value.split("\n").map((v: string) => v.trim()).filter((v: string) => v);
       const expression = expressionRef.current.value.trim();
       tokens = tokenize(expression);
 
