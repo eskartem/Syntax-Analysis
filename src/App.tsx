@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import './App.css';
 
 const App: React.FC = () => {
@@ -10,6 +10,7 @@ const App: React.FC = () => {
   let tokens: string[] = [];
   let currentIndex = -1;
   let errorFlag = false;
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function tokenize(expression: string) {
     const tokens: string[] = [];
@@ -59,11 +60,13 @@ const App: React.FC = () => {
       E(variables);
       if (currentToken() !== ")") {
         errorFlag = true;
+        setErrorMessage("Ошибка: ожидалась закрывающая скобка ')'");
         return;
       }
       readToken();
     } else {
       errorFlag = true;
+      setErrorMessage("Ошибка: неверный токен");
       return;
     }
 
@@ -79,6 +82,7 @@ const App: React.FC = () => {
       E(variables);
       if (currentToken() !== "then") {
         errorFlag = true;
+        setErrorMessage("Ошибка: ожидалось 'then'");
         return;
       }
       readToken();
@@ -89,6 +93,7 @@ const App: React.FC = () => {
         O(variables);
       } else {
         errorFlag = true;
+        setErrorMessage("Ошибка: ожидалось '$$$' или 'if'");
         return;
       }
 
@@ -100,10 +105,12 @@ const App: React.FC = () => {
           O(variables);
         } else {
           errorFlag = true;
+          setErrorMessage("Ошибка: ожидалось '$$$' или 'if'");
         }
       }
     } else {
       errorFlag = true;
+      setErrorMessage("Ошибка: ожидалось 'if'");
     }
   }
 
@@ -119,16 +126,16 @@ const App: React.FC = () => {
 
       errorFlag = false;
       currentIndex = -1;
+      setErrorMessage(null);
+
+      console.log(errorMessage)
 
       readToken();
       O(variables);
-
-      if (resultRef.current) {
-        resultRef.current.value = errorFlag ? "Ошибка!" : "Верно";
-      }
     }
   };
 
+  
   const clearButton = () => {
     if (variablesRef.current) {
       variablesRef.current.value = "";
@@ -143,8 +150,13 @@ const App: React.FC = () => {
       tokensRef.current.value = "";
     }
   };
-
-
+  
+  useEffect(() => {
+    if (resultRef.current) {
+      resultRef.current.value = errorMessage ? errorMessage : "Верно";
+    }
+  }, [errorMessage]);
+  
   return (
     <div className="container">
       <label className="mainName" >Анализатор логических выражений</label>
